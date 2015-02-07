@@ -1,0 +1,32 @@
+{
+  "name": "lighting-effects",
+  "version": "1.0.0",
+  "description": "A collection of lighting effects",
+  "main": "index.js",
+  "dependencies": {
+    "hsl-to-rgb": "^1.0.0",
+    "opc": "^1.1.2",
+    "suncalc": "^1.6.0",
+    "through2": "^0.6.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/parshap/lighting-effects.git"
+  },
+  "keywords": [
+    "led",
+    "neopixel",
+    "fadecandy",
+    "open pixel control"
+  ],
+  "author": "Parsha Pourkhomami",
+  "license": "Public Domain",
+  "bugs": {
+    "url": "https://github.com/parshap/lighting-effects/issues"
+  },
+  "homepage": "https://github.com/parshap/lighting-effects"
+}
