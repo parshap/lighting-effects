@@ -8,15 +8,28 @@ var Socket = require("net").Socket;
 var createOPCStream = require("opc");
 var createStrand = require("opc/strand");
 
+var effects = {
+  natural: require("./effects/natural"),
+  "knight-rider": require("./effects/knight-rider"),
+};
+
+var effectName = process.argv[2] || "natural";
+var effect = effects[effectName];
+if ( ! effect) {
+  throw new Error("Invalid effect: \"" + effectName + "\"");
+}
+
+// Create network socket
 var socket = new Socket();
 socket.setNoDelay();
 socket.connect(7890);
+// Pipe opc packet stream to network socket
 var stream = createOPCStream();
 stream.pipe(socket);
 
-var knightrider = require("./effects/knight-rider");
+// Create effect and write opc packets
 var strand = createStrand(STRAND_END);
-knightrider(strand.slice(STRAND_START, STRAND_END))
+effect(strand.slice(STRAND_START, STRAND_END))
   .on("data", function() {
     stream.writePixels(0, strand.buffer);
   });
