@@ -4,7 +4,7 @@
   "description": "A collection of lighting effects",
   "main": "index.js",
   "dependencies": {
-    "hsl-to-rgb": "^1.0.0",
+    "hsl-to-rgb": "parshap/hsl_rgb_converter#patch-1",
     "opc": "^1.1.2",
     "suncalc": "^1.6.0",
     "through2": "^0.6.3"
