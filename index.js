@@ -11,6 +11,7 @@ var createStrand = require("opc/strand");
 var effects = {
   natural: require("./effects/natural"),
   "knight-rider": require("./effects/knight-rider"),
+  weather: require("./effects/weather"),
 };
 
 var effectName = process.argv[2] || "natural";
@@ -32,4 +33,7 @@ var strand = createStrand(STRAND_END);
 effect(strand.slice(STRAND_START, STRAND_END))
   .on("data", function() {
     stream.writePixels(0, strand.buffer);
+  })
+  .on("error", function(err) {
+    console.error(err);
   });
