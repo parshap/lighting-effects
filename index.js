@@ -29,8 +29,9 @@ var stream = createOPCStream();
 stream.pipe(socket);
 
 // Create effect and write opc packets
-var strand = createStrand(STRAND_END);
-effect(strand.slice(STRAND_START, STRAND_END))
+var lights = createStrand(STRAND_END);
+var strand = lights.slice(STRAND_START, STRAND_END);
+effect(strand)
   .on("data", function() {
     stream.writePixels(0, strand.buffer);
   })
