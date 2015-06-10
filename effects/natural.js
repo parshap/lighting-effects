@@ -20,7 +20,7 @@ function renderPixels(strand, date) {
 function setAllPixels(strand, color) {
   color = color.map(dim);
   for (var i = 0; i < strand.length; i++) {
-    strand.setPixel(i, color);
+    strand.setPixel(i, color[0], color[1], color[2]);
   }
 }
 
