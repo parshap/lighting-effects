@@ -51,7 +51,6 @@ module.exports = function(strand) {
     var start = Date.now();
     renderPixels(strand, 0);
     stream.push(strand.buffer);
-    stream.push(strand.buffer);
     setInterval(function() {
       renderPixels(strand, Date.now() - start);
       stream.push(strand.buffer);

@@ -186,7 +186,6 @@ module.exports = function(strand) {
     // Initial render, bypassing interpolation
     renderPixels(strand, weather, Date.now());
     stream.push(strand.buffer);
-    stream.push(strand.buffer);
 
     // Update color once every PERIOD
     setInterval(function() {

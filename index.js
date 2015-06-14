@@ -31,6 +31,7 @@ var stream = createOPCStream();
 stream.pipe(socket);
 
 // Create effect and write opc packets
+var isFirstWrite = true;
 var lights = createStrand(STRAND_END);
 var strand = lights.slice(STRAND_START, STRAND_END);
 effect(strand)
@@ -40,4 +41,9 @@ effect(strand)
   .pipe(createNaturalDim(SF_LAT_LONG[0], SF_LAT_LONG[1]))
   .on("data", function() {
     stream.writePixels(0, lights.buffer);
+    if (isFirstWrite) {
+      // Override Fadecandy interpolation
+      isFirstWrite = false;
+      stream.writePixels(0, lights.buffer);
+    }
   });

@@ -33,7 +33,6 @@ module.exports = function(strand) {
   // Set starting color, bypassing interpolation
   renderPixels(strand, Date.now());
   stream.push(strand.buffer);
-  stream.push(strand.buffer);
 
   // Update color once every PERIOD
   setInterval(function() {
