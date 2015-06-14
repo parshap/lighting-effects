@@ -16,14 +16,9 @@ function getColor(lux) {
 }
 
 function setAllPixels(strand, color) {
-  color = color.map(dim).map(Math.round);
   for (var i = 0; i < strand.length; i++) {
     strand.setPixel(i, color[0], color[1], color[2]);
   }
-}
-
-function dim(val) {
-  return 0.5 * val;
 }
 
 function renderPixels(strand, time) {
