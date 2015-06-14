@@ -39,26 +39,6 @@ function forecastWeather(callback) {
   });
 }
 
-function setAllPixels(strand, color) {
-  color = color.map(dim);
-  for (var i = 0; i < strand.length; i++) {
-    strand.setPixel(i, color[0], color[1], color[2]);
-  }
-}
-
-function dim(val) {
-  return 0.5 * val;
-}
-
-function findFirstBefore(items, fn) {
-  var i;
-  for (i = 0; i < items.length; i++) {
-    if (fn(items[i])) {
-      return Math.max(i - 1, 0);
-    }
-  }
-}
-
 function findFirst(items, fn) {
   var i;
   for (i = 0; i < items.length; i++) {
