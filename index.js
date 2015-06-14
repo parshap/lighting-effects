@@ -36,7 +36,7 @@ var strand = lights.slice(STRAND_START, STRAND_END);
 effect(strand)
   .pipe(createNaturalDim(SF_LAT_LONG[0], SF_LAT_LONG[1]))
   .on("data", function() {
-    stream.writePixels(0, strand.buffer);
+    stream.writePixels(0, lights.buffer);
   })
   .on("error", function(err) {
     console.error(err);
