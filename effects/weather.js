@@ -6,14 +6,14 @@ var RENDER_INTERVAL = 1000 * 60; // 1 minute
 var WEATHER_UPDATE_INTERVAL = 1000 * 60 * 30; // 30 minutes
 var DOMAIN_PERIOD = 1000 * 60 * 60 * 12; // 12 hours
 // Temperatures
-var COOL_DEG = 54;
-var WARM_DEG = 86;
-var NORMAL_DEG_LOW = 68;
-var NORMAL_DEG_HIGH = 72;
+var COOL_DEG = 50;
+var WARM_DEG = 90;
+var NORMAL_DEG_LOW = 70;
+var NORMAL_DEG_HIGH = 70;
 // Colors
-var WARM_HUE = 0 + 40;
+var WARM_HUE = 0;
 var NORMAL_HUE = 120;
-var COOL_HUE = 240 - 40;
+var COOL_HUE = 240;
 
 var through = require("through2");
 var once = require("once");
