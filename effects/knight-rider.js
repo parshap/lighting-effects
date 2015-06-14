@@ -40,7 +40,7 @@ function renderPixels(strand, time) {
     lux = Math.max(getPixelLux(time, lightPos, pixelPos),
       getPixelLux(time, lightPos, 1 - pixelPos));
 
-    var color = hsltorgb(0, 1, lux);
+    var color = hsltorgb(0, 1, lux * 0.5);
     strand.setPixel(i, color[0], color[1], color[2]);
   }
 }

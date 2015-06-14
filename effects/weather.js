@@ -159,7 +159,7 @@ function getHue(temp) {
 function getColor(temp) {
   var hue = getHue(temp);
   if (hue != null) {
-    return hsltorgb(hue, 1, 1);
+    return hsltorgb(hue, 1, 0.5);
   }
 }
 
