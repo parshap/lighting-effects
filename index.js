@@ -3,10 +3,12 @@
 var STRAND_START = 7 * 64;
 var STRAND_LENGTH = 55;
 var STRAND_END = STRAND_START + STRAND_LENGTH;
+var SF_LAT_LONG = [37.7833, -122.4167];
 
 var Socket = require("net").Socket;
 var createOPCStream = require("opc");
 var createStrand = require("opc/strand");
+var createNaturalDim = require("lib/natural-dim");
 
 var effects = {
   natural: require("./effects/natural"),
@@ -32,6 +34,7 @@ stream.pipe(socket);
 var lights = createStrand(STRAND_END);
 var strand = lights.slice(STRAND_START, STRAND_END);
 effect(strand)
+  .pipe(createNaturalDim(SF_LAT_LONG[0], SF_LAT_LONG[1]))
   .on("data", function() {
     stream.writePixels(0, strand.buffer);
   })
