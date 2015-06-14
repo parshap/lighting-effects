@@ -34,10 +34,10 @@ stream.pipe(socket);
 var lights = createStrand(STRAND_END);
 var strand = lights.slice(STRAND_START, STRAND_END);
 effect(strand)
+  .on("error", function(err) {
+    console.error(err);
+  })
   .pipe(createNaturalDim(SF_LAT_LONG[0], SF_LAT_LONG[1]))
   .on("data", function() {
     stream.writePixels(0, lights.buffer);
-  })
-  .on("error", function(err) {
-    console.error(err);
   });
