@@ -22,6 +22,7 @@ var hsltorgb = require("hsl-to-rgb");
 
 var forecast = new ForecastIO({
   APIKey: FORECASTIO_KEY,
+  timeout: 10000,
 });
 
 function forecastWeather(callback) {
