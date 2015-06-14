@@ -8,7 +8,7 @@ var SF_LAT_LONG = [37.7833, -122.4167];
 var Socket = require("net").Socket;
 var createOPCStream = require("opc");
 var createStrand = require("opc/strand");
-var createNaturalDim = require("lib/natural-dim");
+var createNaturalDim = require("./lib/natural-dim");
 
 var effects = {
   natural: require("./effects/natural"),
