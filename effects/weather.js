@@ -68,6 +68,15 @@ function findFirst(items, fn) {
   }
 }
 
+function findLast(items, fn) {
+  var i;
+  for (i = items.length - 1; i >= 0; i--) {
+    if (fn(items[i])) {
+      return i;
+    }
+  }
+}
+
 function getTemps(weather, time) {
   var temps = weather.hourly.data.map(function(data) {
     return {
@@ -80,11 +89,11 @@ function getTemps(weather, time) {
     return a.time - b.time;
   });
 
-  var first = findFirstBefore(temps, function(temp) {
-    return time > temp.time;
+  var first = findLast(temps, function(temp) {
+    return temp.time <= time;
   });
   var last = findFirst(temps, function(temp) {
-    return temp.time > (time + DOMAIN_PERIOD);
+    return temp.time >= (time + DOMAIN_PERIOD);
   });
 
   temps = temps.slice(first, last + 1);
@@ -104,25 +113,21 @@ function interpolateValue(val1, val2, weight) {
 }
 
 function getInterpolatedTemp(temps, z) {
-  var i;
-  var first = findFirstBefore(temps, function(temp) {
-    return temp.z > z;
+  var first = findLast(temps, function(temp) {
+    return temp.z <= z;
   });
-  if (first == null) {
+  var last = findFirst(temps, function(temp) {
+    return temp.z >= z
+  });
+
+  if (first == null || last == null) {
     return null;
   }
-  else if (temps[first].z > z) {
-    return temps[first].apparentTemperature;
-  }
-  else if (first === temps.length - 1) {
-    return temps[first].apparentTemperature;
-  }
-  else {
-    var a = temps[first];
-    var b = temps[first + 1];
-    var zz = (z - a.z) / (b.z - a.z)
-    return interpolateValue(a.apparentTemperature, b.apparentTemperature, zz);
-  }
+
+  var a = temps[first];
+  var b = temps[last];
+  var zz = (z - a.z) / (b.z - a.z) || 0;
+  return interpolateValue(a.apparentTemperature, b.apparentTemperature, zz);
 }
 
 var HUE_INTERPOLATION = [
