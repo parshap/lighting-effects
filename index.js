@@ -1,5 +1,10 @@
 "use strict";
 
+require("bole").output({
+  level: "debug",
+  stream: process.stderr,
+});
+
 var STRAND_START = 7 * 64;
 var STRAND_LENGTH = 55;
 var STRAND_END = STRAND_START + STRAND_LENGTH;

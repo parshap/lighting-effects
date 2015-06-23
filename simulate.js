@@ -2,6 +2,11 @@
 
 var STRAND_LENGTH = 55;
 
+require("bole").output({
+  level: "debug",
+  stream: process.stderr,
+});
+
 var createSimulator = require("opc-simulator");
 var createOPCStream = require("opc");
 var createStrand = require("opc/strand");

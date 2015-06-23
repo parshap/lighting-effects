@@ -19,17 +19,37 @@ var through = require("through2");
 var once = require("once");
 var ForecastIO = require("forecast.io");
 var hsltorgb = require("hsl-to-rgb");
+var _log = require("bole")("effects/weather");
+var log = _log;
 
 var forecast = new ForecastIO({
   APIKey: FORECASTIO_KEY,
   timeout: 10000,
 });
 
+function logWeather(weather) {
+  log.info("weather", {
+    hourly: weather.hourly.data.slice(0, 24).map(function(temp) {
+      return {
+        time: new Date(temp.time * 1000),
+        apparentTemperature: temp.apparentTemperature,
+      };
+    }),
+  });
+}
+
 function forecastWeather(callback) {
+  var log = _log("forecast.io");
+  var start = Date.now();
   var options = {
     exclude: "currently,minutely,daily,alerts",
   };
+  log.debug("request");
   forecast.get(SF_LAT_LONG[0], SF_LAT_LONG[1], options, function(err, resp, data) {
+    log.info("response", {
+      err: err,
+      elapsed: Date.now() - start,
+    });
     if (err) {
       return callback(err);
     }
@@ -202,6 +222,7 @@ module.exports = function(strand) {
       }
       else {
         weather = w;
+        logWeather(weather);
         start();
       }
       setTimeout(updateWeather, WEATHER_UPDATE_INTERVAL);
