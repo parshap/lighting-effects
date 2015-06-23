@@ -10,8 +10,11 @@ require("bole").output({
 var createSimulator = require("opc-simulator");
 var createOPCStream = require("opc");
 var createStrand = require("opc/strand");
+var getEffect = require("./effects");
 
-var effect = require("./effects/weather");
+// Get effect
+var effectName = process.argv[2] || "natural";
+var effect = getEffect(effectName);
 
 var strand = createStrand(STRAND_LENGTH);
 createSimulator(function() {

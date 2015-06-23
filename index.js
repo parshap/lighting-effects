@@ -14,18 +14,11 @@ var Socket = require("net").Socket;
 var createOPCStream = require("opc");
 var createStrand = require("opc/strand");
 var createNaturalDim = require("./lib/natural-dim");
+var getEffect = require("./effects");
 
-var effects = {
-  natural: require("./effects/natural"),
-  "knight-rider": require("./effects/knight-rider"),
-  weather: require("./effects/weather"),
-};
-
+// Get effect
 var effectName = process.argv[2] || "natural";
-var effect = effects[effectName];
-if ( ! effect) {
-  throw new Error("Invalid effect: \"" + effectName + "\"");
-}
+var effect = getEffect(effectName);
 
 // Create network socket
 var socket = new Socket();
