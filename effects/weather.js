@@ -1,6 +1,6 @@
 "use strict";
 
-var FORECASTIO_KEY = process.env.FORECASTIO_KEY
+var FORECASTIO_KEY = process.env.FORECASTIO_KEY;
 var SF_LAT_LONG = [37.7833, -122.4167];
 var RENDER_INTERVAL = 1000 * 60; // 1 minute
 var WEATHER_UPDATE_INTERVAL = 1000 * 60 * 30; // 30 minutes
@@ -8,8 +8,7 @@ var DOMAIN_PERIOD = 1000 * 60 * 60 * 12; // 12 hours
 // Temperatures
 var COOL_DEG = 50;
 var WARM_DEG = 90;
-var NORMAL_DEG_LOW = 70;
-var NORMAL_DEG_HIGH = 70;
+var NORMAL_DEG = 70;
 // Colors
 var WARM_HUE = 0;
 var NORMAL_HUE = 120;
@@ -117,7 +116,7 @@ function getInterpolatedTemp(temps, z) {
     return temp.z <= z;
   });
   var last = findFirst(temps, function(temp) {
-    return temp.z >= z
+    return temp.z >= z;
   });
 
   if (first == null || last == null) {
@@ -136,11 +135,7 @@ var HUE_INTERPOLATION = [
     value: COOL_HUE,
   },
   {
-    score: NORMAL_DEG_LOW,
-    value: NORMAL_HUE,
-  },
-  {
-    score: NORMAL_DEG_LOW,
+    score: NORMAL_DEG,
     value: NORMAL_HUE,
   },
   {
@@ -159,7 +154,7 @@ function interpolate(points, score) {
       else {
         var a = points[i - 1];
         var b = points[i];
-        var weight = (score - a.score) / (b.score - a.score)
+        var weight = (score - a.score) / (b.score - a.score);
         return interpolateValue(a.value, b.value, weight);
       }
     }
