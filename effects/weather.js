@@ -27,14 +27,14 @@ var forecast = new ForecastIO({
 });
 
 function logWeather(weather) {
-  log.info("weather", {
+  log.info({
     hourly: weather.hourly.data.slice(0, 24).map(function(temp) {
       return {
         time: new Date(temp.time * 1000),
         apparentTemperature: temp.apparentTemperature,
       };
     }),
-  });
+  }, "weather");
 }
 
 function forecastWeather(callback) {
@@ -45,10 +45,10 @@ function forecastWeather(callback) {
   };
   log.debug("request");
   forecast.get(SF_LAT_LONG[0], SF_LAT_LONG[1], options, function(err, resp, data) {
-    log.info("response", {
+    log.info({
       err: err,
       elapsed: Date.now() - start,
-    });
+    }, "response");
     if (err) {
       return callback(err);
     }
