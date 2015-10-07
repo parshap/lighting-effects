@@ -16,11 +16,14 @@
     "through2": "^0.6.3"
   },
   "devDependencies": {
-    "tape": "^4.0.0"
+    "tape": "^4.0.0",
+    "node-dev": "^2.7.1"
   },
   "scripts": {
     "start": "node index.js",
-    "test": "tape test/*.js"
+    "test": "tape test/*.js",
+    "simulate": "node simulate.js",
+    "watch-simulate": "node-dev simulate.js"
   },
   "repository": {
     "type": "git",

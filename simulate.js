@@ -17,10 +17,14 @@ var effectName = process.argv[2] || "natural";
 var effect = getEffect(effectName);
 
 var strand = createStrand(STRAND_LENGTH);
-createSimulator(function() {
+var server = createSimulator(function() {
   var stream = createOPCStream();
   effect(strand).on("data", function() {
     stream.writePixels(0, strand.buffer);
   });
   return stream;
-}).listen(process.env.PORT || 8080);
+});
+server.listen(process.env.PORT || 8080, function() {
+  console.log("Listening %s", JSON.stringify(server.address()));
+});
+console.log("\"%s\" simulation started", effectName);
