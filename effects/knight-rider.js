@@ -50,10 +50,10 @@ module.exports = function(strand) {
   stream.reset = function() {
     var start = Date.now();
     renderPixels(strand, 0);
-    stream.push(strand.buffer);
+    stream.push(strand);
     setInterval(function() {
       renderPixels(strand, Date.now() - start);
-      stream.push(strand.buffer);
+      stream.push(strand);
     }, (1 / (strand.length - 1)) * PERIOD);
   };
   stream.reset();

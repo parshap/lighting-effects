@@ -200,12 +200,12 @@ module.exports = function(strand) {
   var start = once(function() {
     // Initial render, bypassing interpolation
     renderPixels(strand, weather, Date.now());
-    stream.push(strand.buffer);
+    stream.push(strand);
 
     // Update color once every PERIOD
     setInterval(function() {
       renderPixels(strand, weather, Date.now());
-      stream.push(strand.buffer);
+      stream.push(strand);
     }, RENDER_INTERVAL);
   });
 

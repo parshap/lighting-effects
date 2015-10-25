@@ -19,7 +19,7 @@ var effect = getEffect(effectName);
 var strand = createStrand(STRAND_LENGTH);
 var server = createSimulator(function() {
   var stream = createOPCStream();
-  effect(strand).on("data", function() {
+  effect(strand).on("data", function(strand) {
     stream.writePixels(0, strand.buffer);
   });
   return stream;
