@@ -4,6 +4,7 @@ var effects = {
   natural: require("./natural"),
   "knight-rider": require("./knight-rider"),
   weather: require("./weather"),
+  "weather-rider": require("./weather-rider"),
 };
 
 
