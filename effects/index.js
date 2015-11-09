@@ -5,6 +5,7 @@ var effects = {
   "knight-rider": require("./knight-rider"),
   weather: require("./weather"),
   "weather-rider": require("./weather-rider"),
+  "explosions": require("./explosions"),
 };
 
 

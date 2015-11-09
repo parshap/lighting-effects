@@ -6,6 +6,7 @@
   "dependencies": {
     "bistre": "^1.0.1",
     "bole": "^2.0.0",
+    "clamp": "^1.0.1",
     "color-convert": "^0.6.0",
     "forecast.io": "0.0.9",
     "hsl-to-rgb": "parshap/hsl_rgb_converter#patch-1",
