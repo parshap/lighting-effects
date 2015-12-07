@@ -1,9 +1,10 @@
 "use strict";
 
+var color = require("color-convert");
 var createStrand = require("opc/strand");
+var combineEffects = require("../lib/combine-effects");
 var weather = require("./weather");
 var rider = require("./knight-rider");
-var color = require("color-convert");
 
 module.exports = function(strand) {
   return combineEffects(
@@ -25,24 +26,4 @@ module.exports = function(strand) {
       return strand;
     }
   );
-};
-
-var through = require("through2");
-
-var combineEffects = function(strand, streams, combineFn) {
-  var retstream = through.obj();
-  var strands = streams.map(function() {
-    return null;
-  });
-  streams.forEach(function(stream, i) {
-    stream.on("data", function(emittedStrand) {
-      strands[i] = emittedStrand;
-      if (strands.every(Boolean)) {
-        strand = combineFn(strand, strands);
-        retstream.push(strand);
-      }
-    });
-    stream.on("error", retstream.emit.bind(retstream, "error"));
-  });
-  return retstream;
 };
