@@ -6,6 +6,7 @@ var effects = {
   weather: require("./weather"),
   "weather-rider": require("./weather-rider"),
   "explosions": require("./explosions"),
+  "christmas": require("./christmas"),
 };
 
 
