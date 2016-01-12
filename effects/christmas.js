@@ -7,6 +7,7 @@ var LIGHT_SIZE = 0.03;
 
 var CHRISTMAS_HUES_SETS = [
   [hsltorgb(0, 1, 0.5), hsltorgb(120, 1, 0.5)],
+  [hsltorgb(356, 0.9, 0.5), hsltorgb(184, 0.6, 0.5), hsltorgb(69, 0.8, 0.5)],
 ];
 
 function renderAlternatingColorPixels(strand, options) {
