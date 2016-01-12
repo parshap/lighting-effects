@@ -1,18 +1,19 @@
 "use strict";
 
 var FORECASTIO_KEY = process.env.FORECASTIO_KEY;
+var TEST_TEMP_COLORS = !! process.env.TEST_TEMP_COLORS;
 var SF_LAT_LONG = [37.7833, -122.4167];
 var RENDER_INTERVAL = 1000 * 60; // 1 minute
 var WEATHER_UPDATE_INTERVAL = 1000 * 60 * 30; // 30 minutes
 var DOMAIN_PERIOD = 1000 * 60 * 60 * 12; // 12 hours
 // Temperatures
-var COOL_DEG = 50;
-var WARM_DEG = 90;
-var NORMAL_DEG = 70;
+var COLD_DEG = 40;
+var HOT_DEG = 90;
+var NORMAL_DEG = 65;
 // Colors
-var WARM_HUE = 0;
+var HOT_HUE = 0;
 var NORMAL_HUE = 120;
-var COOL_HUE = 240;
+var COLD_HUE = 240;
 
 var through = require("through2");
 var once = require("once");
@@ -77,6 +78,18 @@ function findLast(items, fn) {
 }
 
 function getTemps(weather, time) {
+  if (TEST_TEMP_COLORS) {
+    return [
+      {
+        z: 0,
+        apparentTemperature: COLD_DEG,
+      },
+      {
+        z: 1,
+        apparentTemperature: HOT_DEG,
+      },
+    ];
+  }
   var temps = weather.hourly.data.map(function(data) {
     return {
       time: data.time * 1000,
@@ -131,16 +144,16 @@ function getInterpolatedTemp(temps, z) {
 
 var HUE_INTERPOLATION = [
   {
-    score: COOL_DEG,
-    value: COOL_HUE,
+    score: COLD_DEG,
+    value: COLD_HUE,
   },
   {
     score: NORMAL_DEG,
     value: NORMAL_HUE,
   },
   {
-    score: WARM_DEG,
-    value: WARM_HUE,
+    score: HOT_DEG,
+    value: HOT_HUE,
   },
 ];
 
