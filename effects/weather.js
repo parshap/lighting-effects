@@ -15,21 +15,32 @@ var HOT_HUE = 0;
 var NORMAL_HUE = 120;
 var COLD_HUE = 240;
 
+var findFirstIndex = require("lodash/findIndex");
+var findLastIndex = require("lodash/findLastIndex");
 var through = require("through2");
 var once = require("once");
 var ForecastIO = require("forecast.io");
 var hsltorgb = require("hsl-to-rgb");
+var createStrand = require("opc/strand");
+var lerp = require("../lib/lerp");
+var combineEffects = require("../lib/combine-effects");
+var scale = require("../lib/scale");
+
 var _log = require("bole")("effects/weather");
 var log = _log;
+
+
+// ## Forecast.io API
+//
 
 var forecast = new ForecastIO({
   APIKey: FORECASTIO_KEY,
   timeout: 10000,
 });
 
-function logWeather(weather) {
+function logWeather(weatherData) {
   log.info({
-    hourly: weather.hourly.data.slice(0, 24).map(function(temp) {
+    hourly: weatherData.hourly.data.slice(0, 24).map(function(temp) {
       return {
         time: new Date(temp.time * 1000),
         apparentTemperature: temp.apparentTemperature,
@@ -39,6 +50,10 @@ function logWeather(weather) {
 }
 
 function forecastWeather(callback) {
+  process.nextTick(function() {
+    callback(null, require("../sample-weather.json"));
+  });
+  return;
   var log = _log("forecast.io");
   var start = Date.now();
   var options = {
@@ -54,92 +69,76 @@ function forecastWeather(callback) {
       return callback(err);
     }
     else {
+      require("fs").writeFileSync("sample-weather.json", JSON.stringify(data));
       callback(null, data);
     }
   });
 }
 
-function findFirst(items, fn) {
-  var i;
-  for (i = 0; i < items.length; i++) {
-    if (fn(items[i])) {
-      return i;
-    }
-  }
-}
+// ## Precipitation
+//
+// Precipitation is shown with pixels animated to fade in and out (i.e., modulating the lightness factor). Two metrics affect the animation: precipitation probability and intensity.
+//
+// Probability affects the intensity of the fading (i.e., how big the change in lightness is). When there is a low change of rain, the pixel's lightness will change only slightly, and thus be barely noticeable.
+//
+// Intensity affects the speed of the animation. The more intense the precipitation, the faster pixels will fade in and out.
+//
+// Low probability will result in a slow, non-regular periods. The uncertainty is represented by 
+//
+// are used to control the animation
+//
+// Precipitation is shown in two ways: probability and intensity.
+//
+// Probability is shown with a fadin
+//
+// > A very rough guide is that a value of 0 in./hr. corresponds to no
+// > precipitation, 0.002 in./hr. corresponds to very light precipitation,
+// 0.017in./hr. corresponds to light precipitation, 0.1 in./hr. corresponds to
+// moderate precipitation, and 0.4 in./hr. corresponds to heavy precipitation.
 
-function findLast(items, fn) {
-  var i;
-  for (i = items.length - 1; i >= 0; i--) {
-    if (fn(items[i])) {
-      return i;
-    }
-  }
-}
-
-function getTemps(weather, time) {
+// Take weather data from forecast.io and return a time-series array of data,
+// each containing a z-scale "time" and data used for the effect.
+function normalizeWeatherData(weatherData, time) {
   if (TEST_TEMP_COLORS) {
     return [
       {
-        z: 0,
+        time: 0,
         apparentTemperature: COLD_DEG,
+        precipProbability: 1,
+        precipIntensity: 0.4,
       },
       {
-        z: 1,
+        time: 1,
         apparentTemperature: HOT_DEG,
+        precipProbability: 0,
+        precipIntensity: 0,
       },
     ];
   }
-  var temps = weather.hourly.data.map(function(data) {
+  var hours = weatherData.hourly.data.map(function(hour) {
     return {
-      time: data.time * 1000,
-      apparentTemperature: data.apparentTemperature,
+      time: hour.time * 1000,
+      x: (hour.time - time) / DOMAIN_PERIOD,
+      apparentTemperature: hour.apparentTemperature,
+      precipProbability: hour.precipProbability,
+      precipIntensity: hour.precipIntensity,
     };
   });
 
-  temps = temps.sort(function(a, b) {
+  hours.sort(function(a, b) {
     return a.time - b.time;
   });
 
-  var first = findLast(temps, function(temp) {
-    return temp.time <= time;
+  var first = findLastIndex(hours, function(hour) {
+    return hour.time <= time;
   });
-  var last = findFirst(temps, function(temp) {
-    return temp.time >= (time + DOMAIN_PERIOD);
+  var last = findFirstIndex(hours, function(hour) {
+    return hour.time >= (time + DOMAIN_PERIOD);
   });
-
-  temps = temps.slice(first, last + 1);
-
-  temps = temps.map(function(temp) {
-    return {
-      z: (temp.time - time) / DOMAIN_PERIOD,
-      apparentTemperature: temp.apparentTemperature,
-    };
-  });
-
-  return temps;
-}
-
-function interpolateValue(val1, val2, weight) {
-  return val1 * (1 - weight) + val2 * weight;
-}
-
-function getInterpolatedTemp(temps, z) {
-  var first = findLast(temps, function(temp) {
-    return temp.z <= z;
-  });
-  var last = findFirst(temps, function(temp) {
-    return temp.z >= z;
-  });
-
-  if (first == null || last == null) {
-    return null;
+  if (first === -1 || last === -1) {
+    return [];
   }
-
-  var a = temps[first];
-  var b = temps[last];
-  var zz = (z - a.z) / (b.z - a.z) || 0;
-  return interpolateValue(a.apparentTemperature, b.apparentTemperature, zz);
+  return hours.slice(first, last + 1);
 }
 
 var HUE_INTERPOLATION = [
@@ -157,85 +156,134 @@ var HUE_INTERPOLATION = [
   },
 ];
 
-function interpolate(points, score) {
-  var i;
-  for (i = 0; i < points.length; i++) {
-    if (points[i].score > score) {
-      if (i === 0) {
-        return points[0].value;
-      }
-      else {
-        var a = points[i - 1];
-        var b = points[i];
-        var weight = (score - a.score) / (b.score - a.score);
-        return interpolateValue(a.value, b.value, weight);
-      }
-    }
-  }
-  if (points.length === 0) {
-    return null;
-  }
-  else {
-    return points[points.length - 1].value;
-  }
+function getTemperatureHue(temp) {
+  return lerp(HUE_INTERPOLATION, temp, {
+    getX: function(def) {
+      return def.score;
+    },
+    getY: function(def) {
+      return def.value;
+    },
+  });
 }
 
-function getHue(temp) {
-  return interpolate(HUE_INTERPOLATION, temp);
-}
-
-function getColor(temp) {
-  var hue = getHue(temp);
-  if (hue != null) {
-    return hsltorgb(hue, 1, 0.5);
-  }
+function getPrecipAnimationLightness(time, data) {
+  var period = 1000;
+  // (0.4 / (data.precipIntensity / 0.4))
+  var x = (time % period) / period;
+  console.log(data.precipProbability, x, scale(data.precipProbability, {
+    domain: [0, 1],
+    range: [1, x],
+  }));
+  return scale(data.precipProbability, {
+    domain: [0, 1],
+    range: [1, x],
+  });
 }
 
 function renderPixels(strand, weather, time) {
-  var temps = getTemps(weather, time);
+  var hours = normalizeWeatherData(weather, time);
 
-  for (var i = 0; i < strand.length; i++) {
-    var z = i / (strand.length - 1);
-    var temp = getInterpolatedTemp(temps, z);
-    var color = getColor(temp);
-    if (color) {
-      strand.setPixel(i, color[0], color[1], color[2]);
-    }
+  for (var pixelIndex = 0; pixelIndex < strand.length; pixelIndex++) {
+    var pixelTime = pixelIndex / (strand.length - 1);
+    var pixelWeatherData = lerpWeatherData(hours, pixelTime);
+    var color = hsltorgb(
+      getTemperatureHue(pixelWeatherData.apparentTemperature),
+      1,
+      0.5 * getPrecipAnimationLightness(Date.now(), pixelWeatherData)
+    );
+    strand.setPixel(pixelIndex, color[0], color[1], color[2]);
   }
 }
 
-module.exports = function(strand) {
-  var stream = through.obj();
-  var weather;
+function getHourWeatherTime(value) {
+  return value.x;
+}
+
+function lerpWeatherData(hours, time) {
+  return {
+    time: time,
+    apparentTemperature: lerp(hours, time, {
+      getX: getHourWeatherTime,
+      getY: function(def) {
+        return def.apparentTemperature;
+      },
+    }),
+    precipProbability: lerp(hours, time, {
+      getX: getHourWeatherTime,
+      getY: function(def) {
+        return def.precipProbability;
+      },
+    }),
+    precipIntensity: lerp(hours, time, {
+      getX: getHourWeatherTime,
+      getY: function(def) {
+        return def.precipIntensity;
+      },
+    }),
+  };
+}
+
+function createHueEffect(strand) {
+  var weatherData;
+  var stream = through.obj(function(newWeatherData, enc, callback) {
+    weatherData = newWeatherData;
+    start();
+    callback();
+  });
 
   // Create a function to be called once a weather forecast is obtained to
   // begin rendering
   var start = once(function() {
-    // Initial render, bypassing interpolation
-    renderPixels(strand, weather, Date.now());
+    // Initial render
+    var date = new Date(weatherData.hourly.data[0].time * 1000);
+    renderPixels(strand, weatherData, date.getTime());
     stream.push(strand);
 
     // Update color once every PERIOD
     setInterval(function() {
-      renderPixels(strand, weather, Date.now());
+      renderPixels(strand, weatherData, date.getTime());
       stream.push(strand);
-    }, RENDER_INTERVAL);
+    }, 50);
   });
 
+  return stream;
+}
+
+function createPrecipitationEffect(strand) {
+  var stream = through.obj(function(newWeatherData, enc, callback) {
+    this.push(strand);
+    callback();
+  });
+  return stream;
+}
+
+module.exports = function(strand) {
+  var effects = [
+    createHueEffect(createStrand(strand.length)),
+    createPrecipitationEffect(createStrand(strand.length)),
+  ];
+  var combinedEffect = combineEffects(
+    strand,
+    effects,
+    function(strand, strandData) {
+      return strandData[0];
+    }
+  );
   // Update weather forecast periodically
   (function updateWeather() {
-    forecastWeather(function(err, w) {
+    forecastWeather(function(err, weatherData) {
       if (err) {
-        stream.emit("error", err);
+        combinedEffect.emit("error", err);
       }
       else {
-        weather = w;
-        logWeather(weather);
-        start();
+        logWeather(weatherData);
+        effects.forEach(function(effect) {
+          effect.write(weatherData);
+        });
       }
       setTimeout(updateWeather, WEATHER_UPDATE_INTERVAL);
     });
   })();
-
-  return stream;
+  return combinedEffect;
 };

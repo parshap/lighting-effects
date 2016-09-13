@@ -14,17 +14,23 @@ var getEffect = require("./effects");
 
 // Get effect
 var effectName = process.argv[2] || "natural";
-var effect = getEffect(effectName);
+var createEffect = getEffect(effectName);
 
+// Start simulation
+var stream = createOPCStream();
 var strand = createStrand(STRAND_LENGTH);
-var server = createSimulator(function() {
-  var stream = createOPCStream();
-  effect(strand).on("data", function(strand) {
-    stream.writePixels(0, strand.buffer);
-  });
-  return stream;
+var effect = createEffect(strand);
+var simulator = createSimulator(stream);
+effect.on("data", function(strand) {
+  stream.writePixels(0, strand.buffer);
 });
-server.listen(process.env.PORT || 8080, function() {
-  console.log("Listening %s", JSON.stringify(server.address()));
+effect.on("error", function(err) {
+  simulator.emit("error", err);
 });
-console.log("\"%s\" simulation started", effectName);
+simulator.on("error", function(err) {
+  console.error(err);
+});
+simulator.listen(process.env.PORT || 8080, function() {
+  console.log("Listening %s", JSON.stringify(simulator.address()));
+});
+console.log("Starting simulation: %s", JSON.stringify(effectName));
