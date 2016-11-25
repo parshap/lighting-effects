@@ -8,7 +8,7 @@
     "bole": "^2.0.0",
     "clamp": "^1.0.1",
     "color-convert": "^0.6.0",
-    "forecast.io": "0.0.9",
+    "forecast.io": "0.0.11",
     "hsl-to-rgb": "parshap/hsl_rgb_converter#patch-1",
     "lodash": "^4.17.2",
     "ndm": "^3.11.0",
