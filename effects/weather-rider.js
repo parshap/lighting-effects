@@ -10,7 +10,9 @@ module.exports = function(strand) {
   return combineEffects(
     strand,
     [
-      weather(createStrand(strand.length)),
+      weather(createStrand(strand.length), {
+        precipEffect: false,
+      }),
       rider(createStrand(strand.length)),
     ],
     function(strand, strands) {
