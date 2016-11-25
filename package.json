@@ -19,8 +19,11 @@
     "through2": "^0.6.3"
   },
   "devDependencies": {
-    "tape": "^4.0.0",
+    "eslint": "^3.10.2",
+    "eslint-config-airbnb-base": "^10.0.1",
+    "eslint-plugin-import": "^2.2.0",
     "node-dev": "^2.7.1"
+    "tape": "^4.0.0"
   },
   "scripts": {
     "start": "node index.js",

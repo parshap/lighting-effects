@@ -1,0 +1,19 @@
+{
+  "extends": "airbnb-base",
+  "parserOptions": {
+    "sourceType": "script"
+  },
+  "rules": {
+    "prefer-arrow-callback": "off",
+    "func-names": "off",
+    "space-before-function-paren": "off",
+    "quotes": "off",
+    "no-else-return": "off",
+    "brace-style": ["error", "stroustrup"],
+    "max-len": ["error", {
+      "code": 80,
+      "comments": 80,
+      "tabWidth": 2
+    }]
+  }
+}
