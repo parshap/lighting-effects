@@ -16,13 +16,13 @@
     "opc": "^1.1.2",
     "readable-stream": "^2.0.0",
     "suncalc": "^1.6.0",
-    "through2": "^0.6.3"
+    "through2": "^2.0.1"
   },
   "devDependencies": {
     "eslint": "^3.10.2",
     "eslint-config-airbnb-base": "^10.0.1",
     "eslint-plugin-import": "^2.2.0",
-    "node-dev": "^2.7.1"
+    "node-dev": "^3.1.1",
     "tape": "^4.0.0"
   },
   "scripts": {
