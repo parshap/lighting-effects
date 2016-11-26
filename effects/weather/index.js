@@ -20,6 +20,8 @@ function logWeather(weatherData) {
       return {
         time: new Date(temp.time * 1000),
         apparentTemperature: temp.apparentTemperature,
+        precipProbability: temp.precipProbability,
+        precipIntensity: temp.precipIntensity,
       };
     }),
   }, "weather");
