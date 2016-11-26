@@ -118,8 +118,6 @@ function clamp(num, min, max) {
 
 // Take weather data from forecast.io and return a time-series array of data,
 // each containing a z-scale "time" and data used for the effect.
-
-
 const PRECIP_INTENSITY_MODERATE = 2.5;
 const PRECIP_INTENSITY_HEAVY = 10;
 const PRECIP_INTENSITY_VIOLENT = 50;
@@ -127,7 +125,7 @@ const PRECIP_INTENSITY_VIOLENT = 50;
 const PRECIP_LERP_DURATIONS = [
   {
     precipIntensity: 0,
-    duration: 2400,
+    duration: 3600,
   },
   {
     precipIntensity: PRECIP_INTENSITY_MODERATE,
@@ -146,7 +144,7 @@ const PRECIP_LERP_DURATIONS = [
 const PRECIP_LERP_DELAY = [
   {
     precipIntensity: 0,
-    delay: 3000,
+    delay: 4500,
   },
   {
     precipIntensity: PRECIP_INTENSITY_MODERATE,
@@ -168,8 +166,8 @@ const LERP_LIGHTNESS_CHANGE = [
     lightnessChange: 0,
   },
   {
-    precipProbability: 0.01,
-    lightnessChange: 0.3,
+    precipProbability: 0.05,
+    lightnessChange: 0,
   },
   {
     precipProbability: 1,
