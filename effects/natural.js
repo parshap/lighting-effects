@@ -5,7 +5,6 @@ var colortemp = require("../lib/color-temperature");
 var getSunLux = require("../lib/sun-lux");
 
 var PERIOD = 1000 * 60; // 1 minute
-var SF_LAT_LONG = [37.7833, -122.4167];
 var NIGHT_TEMP = 2000;
 var DAY_TEMP = 6000;
 
@@ -21,22 +20,22 @@ function setAllPixels(strand, color) {
   }
 }
 
-function renderPixels(strand, time) {
-  var lux = getSunLux(new Date(time), SF_LAT_LONG[0], SF_LAT_LONG[1]);
+function renderPixels(strand, time, opts) {
+  var lux = getSunLux(new Date(time), opts.latlong[0], opts.latlong[1]);
   var color = getColor(lux);
   setAllPixels(strand, color);
 }
 
-module.exports = function(strand) {
+module.exports = function(strand, opts) {
   var stream = through.obj();
 
   // Set starting color, bypassing interpolation
-  renderPixels(strand, Date.now());
+  renderPixels(strand, Date.now(), opts);
   stream.push(strand);
 
   // Update color once every PERIOD
   setInterval(function() {
-    renderPixels(strand, Date.now());
+    renderPixels(strand, Date.now(), opts);
     stream.push(strand);
   }, PERIOD);
 

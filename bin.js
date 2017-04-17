@@ -24,6 +24,9 @@ var createEffectManager = require("./manager");
 // Get effect
 var effectName = process.argv[2] || "natural";
 var createEffect = getEffect(effectName);
+var effectOpts = {
+  latlong: SF_LAT_LONG,
+};
 
 // Connect to fadecandy server and opc packet stream
 var socket = new Socket();
@@ -35,8 +38,8 @@ var lights = createStrand(STRAND_END);
 var strand = lights.slice(STRAND_START, STRAND_END);
 var manager = createEffectManager(lights);
 manager.setEffect([
-  createEffect(strand)
-    .pipe(createNaturalDim(SF_LAT_LONG[0], SF_LAT_LONG[1]))
+  createEffect(strand, effectOpts)
+    .pipe(createNaturalDim(SF_LAT_LONG))
 ]);
 manager.on("error", function(err) {
   console.error(err);

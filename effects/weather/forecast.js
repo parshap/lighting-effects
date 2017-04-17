@@ -4,8 +4,6 @@ const ForecastIO = require("forecast.io");
 const async = require("async");
 const log = require("bole")("forecast");
 
-const SF_LAT_LONG = [37.7833, -122.4167];
-
 // ## Forecast.io API
 //
 
@@ -62,7 +60,7 @@ function forecastRetry(opts, callback) {
   );
 }
 
-module.exports = function(callback) {
+module.exports = function(opts, callback) {
   let tryStart;
   const forecastOpts = {
     latlong: opts.latlong,
