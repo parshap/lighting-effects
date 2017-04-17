@@ -2,7 +2,8 @@
   "name": "lighting-effects",
   "version": "1.0.0",
   "description": "A collection of lighting effects",
-  "main": "index.js",
+  "main": "bin.js",
+  "bin": "bin.js",
   "dependencies": {
     "bistre": "^1.0.1",
     "bole": "^2.0.0",
@@ -26,7 +27,7 @@
     "tape": "^4.0.0"
   },
   "scripts": {
-    "start": "node index.js",
+    "start": "node bin.js",
     "test": "tape test/*.js",
     "simulate": "node simulate.js",
     "watch-simulate": "node-dev simulate.js"

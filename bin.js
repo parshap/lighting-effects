@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+// This script starts a service that connects to a fadecandy server and sends
+// commands to create the configured lighting effect.
 "use strict";
 
 require("bole").output({
@@ -5,6 +8,8 @@ require("bole").output({
   stream: process.stderr,
 });
 
+var config = process.env;
+var FADECANDY_ADDR = config.FADECANDY_ADDR || 7890;
 var STRAND_START = 7 * 64;
 var STRAND_LENGTH = 55;
 var STRAND_END = STRAND_START + STRAND_LENGTH;
@@ -20,10 +25,10 @@ var createEffectManager = require("./manager");
 var effectName = process.argv[2] || "natural";
 var createEffect = getEffect(effectName);
 
-// Create network socket
+// Connect to fadecandy server and opc packet stream
 var socket = new Socket();
 socket.setNoDelay();
-socket.connect(7890);
+socket.connect(FADECANDY_ADDR);
 
 // Create effect and write opc packets
 var lights = createStrand(STRAND_END);
