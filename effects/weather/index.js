@@ -77,12 +77,12 @@ function maybeWriteSampleData(data, callback) {
   }
 }
 
-function forecastSample(callback) {
+function forecastSample(opts, callback) {
   if (USE_FIXTURES) {
     readSampleData(callback);
   }
   else {
-    forecast(function(err, weatherData) {
+    forecast(opts, function(err, weatherData) {
       if (err) {
         callback(err);
       }
@@ -107,9 +107,10 @@ function forecastSample(callback) {
 // ## Effect
 //
 
-module.exports = function(inputStrand, options = {}) {
+module.exports = function(inputStrand, options) {
   // Default options
   // eslint-disable-next-line no-param-reassign
+  console.log("effect options", options);
   options = Object.assign({
     precipEffect: true,
   }, options);
@@ -160,7 +161,10 @@ module.exports = function(inputStrand, options = {}) {
   // Update weather forecast periodically
   (function updateWeather() {
     // Get weather data using Dark Sky API
-    forecastSample(function(err, weatherData) {
+    const forecastOpts = {
+      latlong: options.latlong,
+    };
+    forecastSample(forecastOpts, function(err, weatherData) {
       if (err) {
         combinedEffect.emit("error", err);
       }
