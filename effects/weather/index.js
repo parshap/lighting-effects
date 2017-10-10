@@ -8,6 +8,7 @@ const createPrecipEffect = require("./precip");
 const forecast = require("./forecast");
 const log = require("bole")("effects/weather");
 const fs = require("fs");
+const normalizeWeatherData = require('./normalize-data');
 
 const WEATHER_UPDATE_INTERVAL = 1000 * 60 * 30; // 30 minutes
 
@@ -16,14 +17,7 @@ const WEATHER_UPDATE_INTERVAL = 1000 * 60 * 30; // 30 minutes
 
 function logWeather(weatherData) {
   log.info({
-    hourly: weatherData.data.hourly.data.slice(0, 24).map(function(temp) {
-      return {
-        time: new Date(temp.time * 1000),
-        apparentTemperature: temp.apparentTemperature,
-        precipProbability: temp.precipProbability,
-        precipIntensity: temp.precipIntensity,
-      };
-    }),
+    data: normalizeWeatherData(weatherData.data),
   }, "weather");
 }
 
@@ -104,33 +98,26 @@ function forecastSample(opts, callback) {
   }
 }
 
-// ## Effect
+// ## Precip + Hue Forecast
 //
 
-module.exports = function(inputStrand, options) {
-  // Default options
-  // eslint-disable-next-line no-param-reassign
-  console.log("effect options", options);
-  options = Object.assign({
-    precipEffect: true,
-  }, options);
+function combineColors(i, strands) {
+  const weatherColor = color.rgb.hsl(strands[0].getPixel(i));
+  const precipColor = color.rgb.hsl(strands[1].getPixel(i));
+  return color.hsl.rgb([
+    weatherColor[0],
+    weatherColor[1],
+    precipColor[2],
+  ]);
+}
 
-  function combineColors(i, strands) {
-    const weatherColor = color.rgb.hsl(strands[0].getPixel(i));
-    const precipColor = color.rgb.hsl(strands[1].getPixel(i));
-    return color.hsl.rgb([
-      weatherColor[0],
-      weatherColor[1],
-      precipColor[2],
-    ]);
-  }
-
+function createPrecipHueEffect(inputStrand, options) {
   const effects = [
-    createHueEffect(createStrand(inputStrand.length)),
+    createHueEffect(createStrand(inputStrand.length), options),
     options.precipEffect &&
-      createPrecipEffect(createStrand(inputStrand.length)),
+      createPrecipEffect(createStrand(inputStrand.length), options),
   ].filter(Boolean);
-  const combinedEffect = combineEffects(
+  return combineEffects(
     inputStrand,
     effects,
     function(strand, strands) {
@@ -157,6 +144,19 @@ module.exports = function(inputStrand, options) {
       return strand;
     }
   );
+}
+
+// ## Effect
+//
+
+module.exports = function(inputStrand, options) {
+  // Default options
+  // eslint-disable-next-line no-param-reassign
+  console.log("effect options", options);
+  options = Object.assign({
+    precipEffect: true,
+  }, options);
+  const effect = createPrecipHueEffect(inputStrand, options);
 
   // Update weather forecast periodically
   (function updateWeather() {
@@ -166,17 +166,15 @@ module.exports = function(inputStrand, options) {
     };
     forecastSample(forecastOpts, function(err, weatherData) {
       if (err) {
-        combinedEffect.emit("error", err);
+        effect.emit("error", err);
       }
       else {
         logWeather(weatherData);
-        effects.forEach(function(effect) {
-          effect.write(weatherData);
-        });
+        effect.write(weatherData);
       }
       setTimeout(updateWeather, WEATHER_UPDATE_INTERVAL);
     });
   }());
 
-  return combinedEffect;
+  return effect;
 };
