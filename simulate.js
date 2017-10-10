@@ -16,10 +16,14 @@ var getEffect = require("./effects");
 var effectName = process.argv[2] || "natural";
 var effect = getEffect(effectName);
 
+const options = {
+  latlong: [37.7833, -122,4167],
+};
+
 var strand = createStrand(STRAND_LENGTH);
 var server = createSimulator(function() {
   var stream = createOPCStream();
-  effect(strand).on("data", function(strand) {
+  effect(strand, options).on("data", function(strand) {
     stream.writePixels(0, strand.buffer);
   });
   return stream;
