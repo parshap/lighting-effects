@@ -1,0 +1,10 @@
+{
+  "lighting-effects": {
+    "scripts": {
+      "start": "node bin.js weather"
+    },
+    "env": {
+      "FORECASTIO_KEY": "c0c37603aa0a0adda4ab2247edcdb547"
+    }
+  }
+}
