@@ -1,0 +1,11 @@
+{
+  "name": "fcserver-service",
+  "version": "1.0.0",
+  "description": "A fadecandy fcserver wrapper for use with ndm",
+  "scripts": {
+    "start": "fadecandy/bin/fcserver-rpi",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
