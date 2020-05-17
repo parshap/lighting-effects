@@ -36,13 +36,14 @@ function shouldRetry(err) {
     'ENOTFOUND',
     'ESOCKETTIMEDOUT',
     'ETIMEDOUT',
+    'EAI_AGAIN',
   ].indexOf(err.code) !== -1;
 }
 
 function forecastRetry(opts, callback) {
   async.retry(
     {
-      times: 10,
+      times: 100,
       // intervals of 100, 200, 400, 800, 1600, ... ms
       interval: retryCount => 50 * Math.pow(2, retryCount),
       errorFilter: shouldRetry,
