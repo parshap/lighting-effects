@@ -6,7 +6,7 @@ const hsltorgb = require("hsl-to-rgb");
 const lerp = require("../../lib/lerp");
 const normalizeWeatherData = require("./normalize-data");
 
-const DOMAIN_PERIOD = 1000 * 60 * 60 * 12; // 12 hours
+const DOMAIN_PERIOD = 1000 * 60 * 60 * 24; // 24 hours
 const RENDER_INTERVAL = 1000 * 60; // 1 minute
 
 const HUE_INTERPOLATION = [

@@ -7,7 +7,7 @@ const through = require("through2");
 const once = require("once");
 const normalizeWeatherData = require("./normalize-data");
 
-const DOMAIN_PERIOD = 1000 * 60 * 60 * 12; // 12 hours
+const DOMAIN_PERIOD = 1000 * 60 * 60 * 24; // 24 hours
 const ANIMATION_RENDER_INTERVAL = 50;
 const NO_ANIMATION_RENDER_INTERVAL = 1000 * 60; // 1 minute
 
