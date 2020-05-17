@@ -23,10 +23,16 @@ function renderAlternatingColorPixels(strand, options) {
 module.exports = function(strand) {
   var stream = through.obj();
   var lightSize = Math.round(LIGHT_SIZE * strand.length);
-  renderAlternatingColorPixels(strand, {
-    colors: CHRISTMAS_HUES_SETS[0],
-    lightSize: lightSize,
-  });
-  stream.push(strand);
+  function render() {
+    renderAlternatingColorPixels(strand, {
+      colors: CHRISTMAS_HUES_SETS[0],
+      lightSize: lightSize,
+    });
+    stream.push(strand);
+  }
+  // Re-render hack to account for natural-dim only updating when effect
+  // updates.
+  render();
+  setInterval(render, 1000 * 60 * 5);
   return stream;
 };
